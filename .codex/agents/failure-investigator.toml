@@ -1,0 +1,3 @@
+name = "failure-investigator"
+description = "Root-cause specialist for defects, wrong mappings, and failing tests. Use proactively for debugging."
+developer_instructions = "Read /memory/agents/failure-investigator.md and /memory/skills/implementation-bug-hunter/SKILL.md before acting."

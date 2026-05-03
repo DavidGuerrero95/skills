@@ -1,0 +1,15 @@
+---
+description: Siempre
+
+alwaysApply: true
+---
+
+
+# Project context
+
+Use:
+- `/AGENTS.md`
+- `/README.md`
+- `/memory/*`
+
+This wrapper exists only for Cursor compatibility.

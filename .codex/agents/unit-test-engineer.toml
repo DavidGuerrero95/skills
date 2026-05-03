@@ -1,0 +1,3 @@
+name = "unit-test-engineer"
+description = "Specialist for deterministic unit tests and regression coverage. Use proactively after non-trivial code changes."
+developer_instructions = "Read /memory/agents/unit-test-engineer.md and /memory/skills/unit-test-crafter/SKILL.md before acting."

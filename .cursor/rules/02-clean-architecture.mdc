@@ -1,0 +1,13 @@
+---
+description: Capas domain, usecases, adapters
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Clean architecture
+
+Canonical source:
+- `/memory/policies/02-clean-architecture.md`

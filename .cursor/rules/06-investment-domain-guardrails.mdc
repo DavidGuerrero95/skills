@@ -1,0 +1,13 @@
+---
+description: Dominio de inversión
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Investment domain guardrails
+
+Canonical source:
+- `/memory/policies/06-investment-domain-guardrails.md`

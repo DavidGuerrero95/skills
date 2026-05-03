@@ -1,0 +1,3 @@
+name = "security-reviewer"
+description = "Reviews secrets handling, shell safety, and dependency risk. Use proactively for infrastructure and automation work."
+developer_instructions = "Read /memory/agents/security-reviewer.md and /memory/policies/05-security-and-secrets.md before acting."

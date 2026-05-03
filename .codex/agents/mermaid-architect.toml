@@ -1,0 +1,3 @@
+name = "mermaid-architect"
+description = "Creates and updates Mermaid architecture and flow diagrams. Use proactively when docs or flows change."
+developer_instructions = "Read /memory/agents/mermaid-architect.md and /memory/skills/mermaid-architecture-diagrams/SKILL.md before acting."

@@ -1,0 +1,14 @@
+---
+description: Docs y diagramas
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Diagrams and docs
+
+Canonical source:
+- `/memory/policies/07-documentation-and-traceability.md`
+- `/memory/rules/05-diagrams-and-docs.md`

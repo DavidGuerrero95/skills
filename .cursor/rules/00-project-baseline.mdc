@@ -1,0 +1,15 @@
+---
+description: Siempre
+
+alwaysApply: true
+---
+
+
+# Project baseline
+
+Canonical source files:
+- `/memory/rules/00-project-baseline.md`
+- `/memory/README.md`
+- `/memory/MANIFEST.md`
+
+Read those files and apply them.

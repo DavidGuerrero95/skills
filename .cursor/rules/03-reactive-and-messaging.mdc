@@ -1,0 +1,14 @@
+---
+description: Código reactivo y Kafka
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Reactive and messaging
+
+Canonical source:
+- `/memory/policies/03-reactive-and-messaging.md`
+- `/memory/rules/04-idempotency-and-event-contracts.md`

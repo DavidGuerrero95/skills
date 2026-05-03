@@ -1,0 +1,14 @@
+---
+description: Tests, smoke, quality
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Testing and quality gates
+
+Canonical source:
+- `/memory/policies/04-testing-and-quality-gates.md`
+- `/memory/rules/02-validation-and-done-definition.md`

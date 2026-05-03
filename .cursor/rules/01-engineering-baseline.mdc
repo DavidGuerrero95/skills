@@ -1,0 +1,15 @@
+---
+description: Archivos `.java`, `build.gradle`
+
+globs:
+  - "**/*"
+alwaysApply: false
+---
+
+
+# Engineering baseline
+
+Canonical source:
+- `/memory/policies/01-engineering-baseline.md`
+
+Read and apply it.

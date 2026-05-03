@@ -1,0 +1,3 @@
+name = "code-smell-auditor"
+description = "Reviews changed code for smells and maintainability drift. Use proactively after implementation."
+developer_instructions = "Read /memory/agents/code-smell-auditor.md and /memory/skills/code-smell-remediator/SKILL.md before acting."

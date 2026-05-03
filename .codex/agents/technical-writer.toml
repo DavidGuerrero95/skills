@@ -1,0 +1,3 @@
+name = "technical-writer"
+description = "Maintains README, ADRs, and runbooks in sync with implementation. Use proactively when behavior changes."
+developer_instructions = "Read /memory/agents/technical-writer.md and /memory/skills/technical-doc-writer/SKILL.md before acting."

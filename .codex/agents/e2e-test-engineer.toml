@@ -1,0 +1,3 @@
+name = "e2e-test-engineer"
+description = "Specialist for smoke and E2E validation across services and scripts. Use proactively for workflow changes."
+developer_instructions = "Read /memory/agents/e2e-test-engineer.md and /memory/skills/e2e-test-crafter/SKILL.md before acting."
