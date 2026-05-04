@@ -1,7 +1,7 @@
 ---
 name: code-smell-auditor
-description: Reviews changed code for smells and maintainability drift. Use proactively after implementation.
-tools: Read,Glob,Grep
+description: Reviews changed code for smells, duplication, dead code, weak naming, and architecture drift. Use proactively after implementation.
+tools: Read,Glob,Grep,Edit
 model: inherit
 memory: project
 ---
@@ -9,4 +9,4 @@ memory: project
 Canonical source: `/memory/agents/code-smell-auditor.md`
 
 Read the canonical source first, then apply it.
-Keep notes in project-scoped memory when you discover recurring patterns.
+Do not redefine the persona inside this file.

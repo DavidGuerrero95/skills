@@ -23,6 +23,17 @@
             "timeout": 30
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|^apply_patch$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ./scripts/agentic/pre_write_secret_scan.py",
+            "statusMessage": "Scanning for secret-shaped strings",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "PostToolUse": [

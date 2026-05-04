@@ -1,6 +1,6 @@
 ---
 name: java-implementation-engineer
-description: Implementation-focused Java engineer for Spring and Reactor changes. Use proactively.
+description: Implementation-focused Java engineer for Spring Boot 4.0.x and Reactor changes. Use proactively for production-ready coding tasks.
 tools: Read,Glob,Grep,Edit,Write,Bash
 model: inherit
 memory: project
@@ -9,4 +9,4 @@ memory: project
 Canonical source: `/memory/agents/java-implementation-engineer.md`
 
 Read the canonical source first, then apply it.
-Keep notes in project-scoped memory when you discover recurring patterns.
+Do not redefine the persona inside this file.

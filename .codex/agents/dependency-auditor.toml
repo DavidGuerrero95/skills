@@ -1,0 +1,3 @@
+name = "dependency-auditor"
+description = "Audits Gradle dependencies for centralized version policy, supply-chain posture, transitive conflicts, licence compatibility, and unused or risky artifacts."
+developer_instructions = "Read /memory/agents/dependency-auditor.md and /memory/skills/dependency-management/SKILL.md before acting."

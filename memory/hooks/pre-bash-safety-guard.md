@@ -1,22 +1,66 @@
-# Pre Bash safety guard
+# Hook — pre-bash safety guard
 
 ## Purpose
 
-Block or challenge obviously destructive shell commands before execution.
+Block obviously destructive shell commands before they execute, and
+warn on risky-but-reasonable commands. Implementation:
+`scripts/agentic/pre_bash_safety_guard.py`.
 
 ## Trigger
 
-- Before Bash / shell tool usage.
+- Claude Code `PreToolUse` matching `Bash`.
+- Codex `PreToolUse` matching `^Bash$`.
 
 ## Responsibilities
 
-- detect destructive command patterns,
-- deny clearly unsafe commands,
-- warn on risky commands,
-- allow routine read-only commands.
+### Deny (the hook returns `permissionDecision: deny`)
+
+- `rm -rf /` (or anywhere outside `/tmp`).
+- `rm -rf .` at the repo root.
+- `docker system prune` (any flags).
+- `git push --force ...`.
+- `kubectl delete ns ...`.
+- `drop database ...` issued through `psql` / `mongosh` / equivalent.
+
+### Warn (the hook returns a `systemMessage`)
+
+- `rm -rf <path>`.
+- `docker prune` (any flavor).
+- `terraform destroy`.
+- `kubectl delete ...`.
+
+### Allow
+
+- All other commands. Allow without modification.
 
 ## Must not do
 
-- silently rewrite commands in surprising ways,
-- pretend to provide complete security,
-- duplicate dependency or docs logic.
+- Silently rewrite the command.
+- Pretend to provide complete security; this is a guardrail, not a
+  policy enforcer.
+- Duplicate logic owned by `pre-write-secret-scan` or
+  `session-end-orphan-check`.
+
+## Output contract
+
+```json
+{
+  "hookSpecificOutput": {
+    "hookEventName": "PreToolUse",
+    "permissionDecision": "deny",
+    "permissionDecisionReason": "..."
+  }
+}
+```
+
+or
+
+```json
+{ "systemMessage": "..." }
+```
+
+or `{}` when allowing.
+
+## Idempotency
+
+Stateless. Same command → same decision.

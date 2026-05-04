@@ -1,0 +1,15 @@
+---
+description: Memoria canónica /memory como fuente única de verdad
+alwaysApply: true
+---
+
+
+# Governance — /memory canonical source
+
+Canonical sources:
+- `/memory/README.md`
+- `/memory/MANIFEST.md`
+- `/memory/policies/00-governance.md`
+
+Adapter folders (`.cursor/rules/`, `.claude/`, `.codex/`, `.agents/`)
+must remain thin pointers. Do not duplicate canonical content here.
