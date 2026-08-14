@@ -3,6 +3,8 @@
 Investigate a defect, identify the narrowest credible root cause,
 propose the safest fix, and add regression validation.
 
+**Pipeline:** `memory/pipelines/bug-fix.md` (ordered stages + gates).
+
 ## Steps
 
 1. Reproduce or restate the failure (one paragraph).

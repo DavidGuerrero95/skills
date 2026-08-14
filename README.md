@@ -87,6 +87,14 @@ AGENTS.md                   # short Codex/Copilot operating guide → /memory
 `database-engineer`, `mermaid-architect`, `technical-writer`,
 `security-reviewer`, `code-reviewer`, `dependency-auditor`.
 
+### Pipelines (`memory/pipelines/`)
+
+Ordered multi-agent chains with an artifact and a **gate** between each
+stage: `feature-delivery`, `bug-fix`, `refactor`, `database-change`,
+`contract-change`, `review-gate`. The main thread runs a pipeline by
+delegating to each stage's agent in order and honoring its gate (see
+`memory/pipelines/README.md`).
+
 ### Commands (`memory/commands/`)
 
 `/implement-feature`, `/review-changes`, `/audit-code-smells`,

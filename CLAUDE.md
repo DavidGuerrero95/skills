@@ -46,6 +46,11 @@ Specialized agents are listed in `/memory/agents/` and exposed via
 `.claude/agents/`. Use the delegation matrix in
 `/memory/rules/03-subagent-delegation.md`.
 
+For recurring multi-agent work, run a **pipeline** from
+`/memory/pipelines/` — an ordered chain of agents with an artifact and a
+gate between each stage (feature delivery, bug fix, refactor, database
+change, contract change, review gate). See `/memory/pipelines/README.md`.
+
 ## Hooks
 
 The session is wired with hygiene hooks. Their **contracts** live in

@@ -3,6 +3,8 @@
 Stabilize failing tests by identifying the root cause, fixing the
 smallest safe issue, and keeping or improving coverage.
 
+**Pipeline:** `memory/pipelines/bug-fix.md` (ordered stages + gates).
+
 ## Steps
 
 1. Reproduce the failing test deterministically.

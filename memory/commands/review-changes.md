@@ -3,6 +3,9 @@
 Review the current diff for correctness, architecture, quality, and
 missing validation. The output is a structured review, not a fix.
 
+**Pipeline:** `memory/pipelines/review-gate.md` (parallel reviewers →
+consolidated merge decision).
+
 ## Review axes
 
 Walk the axes in order. For each, note `file:line` and severity.

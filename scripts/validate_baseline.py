@@ -63,9 +63,40 @@ def check_hooks_have_impl() -> None:
                 )
 
 
+def check_pipelines() -> int:
+    """Every pipeline stage must reference an existing agent or skill."""
+    agent_slugs = {
+        os.path.splitext(os.path.basename(p))[0]
+        for p in glob.glob(os.path.join(ROOT, "memory/agents/*.md"))
+    }
+    skill_slugs = {
+        os.path.basename(os.path.dirname(p))
+        for p in glob.glob(os.path.join(ROOT, "memory/skills/*/SKILL.md"))
+    }
+    n = 0
+    for path in glob.glob(os.path.join(ROOT, "memory/pipelines/*.md")):
+        if os.path.basename(path) == "README.md":
+            continue
+        n += 1
+        rel = os.path.relpath(path, ROOT)
+        text = open(path, encoding="utf-8").read()
+        tokens = re.findall(r"`([^`]+)`", text)
+        # skills referenced as `skills/<slug>` or `skills/<slug>/SKILL.md`
+        for tok in tokens:
+            m = re.match(r"skills/([a-z0-9-]+)", tok)
+            if m and m.group(1) not in skill_slugs:
+                errors.append(f"[pipeline] {rel}: unknown skill '{m.group(1)}'")
+        # at least one recognized agent slug must appear
+        referenced_agents = {t for t in tokens if t in agent_slugs}
+        if not referenced_agents:
+            errors.append(f"[pipeline] {rel}: references no known agent")
+    return n
+
+
 def main() -> int:
     check_canonical_present()
     check_hooks_have_impl()
+    pipelines = check_pipelines()
     counts = {
         "claude-agents": check_pointers(".claude/agents/*.md", "claude"),
         "claude-skills": check_pointers(".claude/skills/*/SKILL.md", "claude"),
@@ -78,6 +109,7 @@ def main() -> int:
         "copilot": check_pointers(".github/instructions/*.instructions.md", "copilot"),
     }
 
+    print(f"Pipelines validated: {pipelines}")
     print("Adapter pointer counts:")
     for k, v in counts.items():
         print(f"  {k}: {v}")

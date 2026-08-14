@@ -36,6 +36,7 @@ produces drift, contradictions and wasted tokens. `/memory` solves it by:
 | `stacks/`        | Language / framework / datastore conventions                   | Universal invariants (those live in policies)   |
 | `skills/`        | Reusable, named workflows with progressive disclosure          | Global policy, persona definition, stack syntax |
 | `agents/`        | Specialized personas / delegates                               | General repo rules, project policy text         |
+| `pipelines/`     | Ordered multi-agent chains (stages + gates + artifacts)        | New personas, workflow how-to (those are skills)|
 | `hooks/`         | Lifecycle automation contracts (rationale + trigger + scope)   | Implementation code (lives in `scripts/`)       |
 | `commands/`      | Explicit user-invoked entrypoints                              | Deep how-to (delegate to a skill)               |
 | `output-styles/` | Communication style only                                       | Validation rules, domain policy                 |

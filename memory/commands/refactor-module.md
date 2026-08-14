@@ -4,6 +4,8 @@ Run a bounded, behavior-preserving refactor on a single module. Use when
 the change is too large for `/audit-code-smells` but smaller than a
 redesign.
 
+**Pipeline:** `memory/pipelines/refactor.md` (ordered stages + gates).
+
 ## When to use
 
 - Repeated duplication across two or more files in the module.

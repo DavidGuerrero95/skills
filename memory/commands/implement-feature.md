@@ -3,6 +3,9 @@
 Use the implementation engineer and architecture guidance to deliver a
 scoped feature safely, in any stack.
 
+**Pipeline:** `memory/pipelines/feature-delivery.md` (ordered stages +
+gates). The delegates below are the stages of that pipeline.
+
 ## When to use
 
 - A new behavior is requested with a defined surface (one or two

@@ -29,6 +29,8 @@ Prefer these sources in order:
 - Update docs when contracts, flows, or operations change.
 - Keep secrets out of source.
 - Use repo skills and agents instead of repeating long prompts.
+- For recurring multi-agent work, run a pipeline from
+  `/memory/pipelines/` (ordered stages + gates).
 - Never duplicate canonical content into adapter folders.
 
 ## What this repository is

@@ -37,6 +37,27 @@ you already have all the context the agent would need.
 | Domain-safety review                                    | (skill `domain-safety-review`, no separate agent)        |
 | State-of-the-art research (pattern selection)           | (skill `state-of-the-art-research`)                      |
 
+## Pipelines (ordered multi-agent chains)
+
+For recurring work that spans several agents in a fixed order, use a
+**pipeline** in `memory/pipelines/` instead of ad-hoc delegation. A
+pipeline fixes the stage order, the artifact passed between stages, and
+the **gate** that must pass before the next stage starts.
+
+| Work shape                    | Pipeline                                |
+| ----------------------------- | --------------------------------------- |
+| Deliver a scoped feature      | `pipelines/feature-delivery.md`         |
+| Fix a reproducible defect     | `pipelines/bug-fix.md`                  |
+| Bounded refactor of a module  | `pipelines/refactor.md`                 |
+| Schema / migration / index    | `pipelines/database-change.md`          |
+| API / event contract change   | `pipelines/contract-change.md`          |
+| Pre-merge quality gate        | `pipelines/review-gate.md`              |
+
+The main thread executes a pipeline by delegating to each stage's agent
+in order and honoring its gate; see `pipelines/README.md` for the stage
+schema and orchestration rules. Pipelines do not replace the single-agent
+delegation above — they compose it.
+
 ## Boundaries on delegation
 
 - **Use the minimum number of active delegates** needed. One implementer

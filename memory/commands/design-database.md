@@ -3,6 +3,9 @@
 Design or change database schema, migrations, and indexes for PostgreSQL
 or MongoDB with integrity, performance, and safe-migration discipline.
 
+**Pipeline:** `memory/pipelines/database-change.md` (ordered stages +
+gates).
+
 ## When to use
 
 - Adding or changing a table / collection, column / field, or constraint.

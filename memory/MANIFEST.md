@@ -56,6 +56,13 @@ accidental re-authoring of canonical content inside runtime adapters.
 | Specialized agent: security reviewer               | `agents/security-reviewer.md`                         |
 | Specialized agent: code reviewer                   | `agents/code-reviewer.md`                             |
 | Specialized agent: dependency auditor              | `agents/dependency-auditor.md`                        |
+| Pipelines index + stage schema                     | `pipelines/README.md`                                 |
+| Pipeline: feature delivery                         | `pipelines/feature-delivery.md`                       |
+| Pipeline: bug fix                                  | `pipelines/bug-fix.md`                                |
+| Pipeline: refactor                                 | `pipelines/refactor.md`                               |
+| Pipeline: database change                          | `pipelines/database-change.md`                        |
+| Pipeline: contract change                          | `pipelines/contract-change.md`                        |
+| Pipeline: review gate                              | `pipelines/review-gate.md`                            |
 | Hook: post-edit code quality reminder              | `hooks/post-edit-code-quality.md`                     |
 | Hook: post-task docs sync                          | `hooks/post-task-docs-sync.md`                        |
 | Hook: pre-bash safety guard                        | `hooks/pre-bash-safety-guard.md`                      |
@@ -89,7 +96,9 @@ accidental re-authoring of canonical content inside runtime adapters.
 4. **Skills do not redeclare policy or stack rules.** They link via
    `Read first`.
 5. **Agents do not contain workflow.** They link to one or more skills.
-6. **Output styles affect tone only.** They never set validation rules.
+6. **Pipelines compose agents.** They fix stage order + gates; they never
+   redeclare a persona (that is an agent) or a how-to (that is a skill).
+7. **Output styles affect tone only.** They never set validation rules.
 7. **Adapter folders never own content.** `.claude/`, `.codex/`,
    `.cursor/`, `.agents/`, and the Copilot instructions under `.github/`
    reference canonical files; they do not redefine them.
