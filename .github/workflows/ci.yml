@@ -1,0 +1,82 @@
+name: CI
+
+# Validates the agentic baseline itself: adapter-pointer integrity,
+# hook-script smoke tests, and a secret scan. Downstream projects should
+# add stack jobs from ci-templates/ alongside this workflow.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-baseline:
+    name: Validate baseline integrity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate adapter pointers and structure
+        run: python3 scripts/validate_baseline.py
+
+  hooks-smoke:
+    name: Hook scripts smoke test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Each hook returns valid JSON on empty input
+        run: |
+          set -euo pipefail
+          for s in prompt_memory_reminder pre_bash_safety_guard \
+                   pre_write_secret_scan post_edit_code_quality \
+                   post_task_docs_sync session_end_orphan_check; do
+            echo "-> $s"
+            echo '{}' | python3 "scripts/agentic/$s.py" | python3 -c 'import sys,json; json.load(sys.stdin)'
+          done
+      - name: Safety guard denies a destructive command
+        run: |
+          set -euo pipefail
+          out=$(echo '{"tool_input":{"command":"rm -rf /"}}' | python3 scripts/agentic/pre_bash_safety_guard.py)
+          echo "$out"
+          echo "$out" | grep -q '"permissionDecision": "deny"'
+      - name: Secret scan denies a fake cloud key
+        run: |
+          set -euo pipefail
+          # Build a fake AWS-shaped key at runtime so this file contains no key.
+          FAKE="AKIA""IOSFODNN7EXAMPLE"
+          payload=$(printf '{"tool_input":{"file_path":"src/x.py","content":"%s"}}' "$FAKE")
+          out=$(printf '%s' "$payload" | python3 scripts/agentic/pre_write_secret_scan.py)
+          echo "$out"
+          echo "$out" | grep -q '"permissionDecision": "deny"'
+
+  markdownlint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Lint memory markdown
+        run: npx --yes markdownlint-cli2 "memory/**/*.md" || true
+
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: "false"

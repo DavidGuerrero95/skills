@@ -2,26 +2,34 @@
 
 ## Principles
 
-- **Every evented workflow declares its canonical effect key.**
+- **Every evented or externally-effecting workflow declares its
+  canonical effect key.**
 - **Replays are either harmless no-ops or intentionally handled deltas.**
-- **Event envelope, broker submission, fill projection, alert and
-  notification effects use distinct keys.** Do not collapse them.
+- **Distinct effects use distinct keys.** Do not collapse envelope
+  dedupe, external submission, projection, and notification into one key.
 
-## Per-layer idempotency matrix
+## Generic idempotency patterns
 
-This matrix is the operating contract for trading workflows. Any change
-that touches one of these layers must keep the column intact.
+Pick the pattern that matches each layer; do not reuse one key across
+layers.
 
-| Layer                                | Canonical key                                                                                  | Topic / effect                                              | Required behavior                                                                                                                                                |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Kafka envelope                        | `eventId`                                                                                      | All consumers with inbox / dedupe                           | Same `eventId` ⇒ effects applied once. Replay identical ⇒ no-op. Same `eventId` + different payload ⇒ contract violation (DLQ + alert).                          |
-| Order to broker                       | `clientOrderId`                                                                                | `paper.order.requested.v1` → `execution-service` → Alpaca   | At most one broker submission per `clientOrderId`. Recovery looks up local DB and broker by client id before resubmitting.                                        |
-| Fill projection                       | `clientOrderId` + `cumulativeFilledQuantity`                                                   | `paper.order.executed.v1` → `portfolio_service_ms`          | Apply the **positive delta** vs. last seen cumulative. Same cumulative ⇒ duplicate. Lower cumulative ⇒ inconsistent / stale (DLQ + investigation).               |
-| Automated exit (rules)                | `portfolioId` + `symbol` + `exitRule` + `marketSnapshotEventId` (DB-unique on `exit_order_request`) | After `market.snapshot.v1` evaluation                      | At most one exit per rule per snapshot. Additional guard: do not emit a SELL while another SELL is pending for the same symbol (`hasPendingExitOrder`).         |
-| Analysis-driven SELL/REDUCE thesis    | Analysis `eventId` + risk dedupe                                                               | `analysis.decision.v1` → risk evaluation                    | Same processed/inbox dedupe as other events. Thesis fraction is read from `thesis_invalidation_sell_fraction`.                                                   |
-| Hourly portfolio summary              | `portfolioId` + truncated hour (`epochSecond / 3600`)                                          | `portfolio.summary.v1` + `notification.requested.v1`        | One publication per portfolio per hour. Valkey key: `portfolio-summary:{portfolioId}:{epochSecond/3600}`.                                                        |
-| Portfolio alert                       | `portfolioId` + `ruleId` + `cooldownWindow`                                                    | `portfolio.alert.triggered.v1` + `notification.requested.v1` | One alert per rule per cooldown window. Valkey key: `portfolio-alert:{portfolioId}:{ruleId}:{epoch/cooldownSec}`.                                                |
-| News digest                           | `contentHash` (SHA-256 of url + headline + window)                                             | MongoDB `news_dedupe_memory` + `notification.requested.v1` | Article with same hash is not republished until TTL expires (default 30 days).                                                                                   |
+| Layer / effect                 | Typical canonical key                              | Required behavior                                                                                       |
+| ------------------------------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Inbound HTTP write             | client-supplied `Idempotency-Key` header           | Same key ⇒ return the stored response; never apply the effect twice.                                   |
+| Message envelope (consumer)    | `eventId` / `messageId` (inbox / dedupe table)     | Same id ⇒ effects applied once. Same id + different payload ⇒ contract violation (dead-letter + alert). |
+| External command submission    | domain command id (e.g. `orderId`, `paymentId`)    | At most one external submission per id. Recovery looks up local + remote state before resubmitting.    |
+| Projection / running total     | domain id + monotonic counter (e.g. `+ version`)   | Apply the **positive delta** vs. last seen. Same counter ⇒ duplicate. Lower ⇒ stale (dead-letter).      |
+| Time-windowed effect           | domain id + truncated window (e.g. `epoch/3600`)   | One effect per entity per window. Store the window key in the cache/DB.                                 |
+| Deduplicated content           | content hash (SHA-256 of the identifying fields)   | Same hash ⇒ not reprocessed until TTL expires.                                                          |
+
+> Fill this into a **project-specific matrix** below, replacing the
+> generic rows with your real topics/endpoints, keys, and effects.
+
+## Project idempotency matrix (fill in)
+
+| Layer                | Canonical key            | Topic / endpoint / effect     | Required behavior         |
+| -------------------- | ------------------------ | ----------------------------- | ------------------------- |
+| `[layer]`            | `[key fields]`           | `[topic / endpoint]`          | `[replay behavior]`       |
 
 ## Review checklist before merging an event-touching change
 
@@ -30,34 +38,31 @@ that touches one of these layers must keep the column intact.
 - What happens on **duplicate delivery**?
 - What happens on **same key + different payload**?
 - What **downstream projection or notification** changes?
-- Is **DLQ behavior** documented with a human-readable reason header?
-- Is the **schema change additive and backward-compatible**? If not,
-  is there a versioned topic (`...v2`)?
-- Are **AsyncAPI** and **JSON Schema** artifacts updated under
-  `docs/contracts/`?
+- Is **dead-letter behavior** documented with a human-readable reason
+  header?
+- Is the **schema change additive and backward-compatible**? If not, is
+  there a versioned topic/endpoint?
+- Are the machine-readable schemas (OpenAPI / AsyncAPI / JSON Schema)
+  under `docs/contracts/` updated?
 
 ## Documentation requirements
 
 Document, in the same change set:
 
-- topic name(s) and version(s),
-- producer and consumer ownership (which service publishes / consumes),
+- topic/endpoint name(s) and version(s),
+- producer and consumer ownership,
 - key fields,
 - replay behavior,
-- DLQ topic name and routing reason,
+- dead-letter topic name and routing reason,
 - env vars introduced or renamed.
 
-Authoritative locations:
-
-- `docs/contracts/topics.md` — topic catalog.
-- `docs/contracts/asyncapi/` — AsyncAPI bundles.
-- `docs/contracts/json-schema/` — JSON schemas.
+Authoritative location: `docs/contracts/`.
 
 ## Forbidden patterns
 
-- Reusing `eventId` as the broker submission key.
-- Treating `brokerOrderId` as sufficient for fill projection.
+- Reusing the envelope id as the external submission key.
+- Treating a downstream-generated id as sufficient for projection.
 - Skipping cooldown / TTL logic in tests "to make them pass".
-- Adding a new evented effect without declaring its key in this matrix.
-- Renaming a topic field without a versioned topic and a documented
-  migration.
+- Adding a new evented effect without declaring its key in the matrix.
+- Renaming a contract field without a versioned topic/endpoint and a
+  documented migration.

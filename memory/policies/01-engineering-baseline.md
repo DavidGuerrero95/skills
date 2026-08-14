@@ -2,121 +2,100 @@
 
 ## Purpose
 
-Define the engineering invariants that apply to **every** Java/Spring
-change in this repository, regardless of which service or skill is in
-use.
+Define the engineering invariants that apply to **every** change in this
+repository, regardless of language, framework, or which skill is in use.
+Language- and framework-specific conventions live in `stacks/*.md`; this
+file states what holds everywhere.
 
-## Stack profile
+## Universal principles
 
-- **Language:** Java 21 (LTS). Use modern language features when they
-  improve clarity: `record`, sealed types, pattern matching for `switch`,
-  text blocks. Do not retrofit older idioms when a record is a better
-  fit.
-- **Framework:** Spring Boot 4.0.x with WebFlux + Reactor 3.7+. Reactive
-  by default. Avoid the Servlet stack unless the module is explicitly
-  blocking.
-- **Build:** Gradle multi-module. **All dependency versions are declared
-  in the root `build.gradle`.** Child modules inherit; they must not
-  declare their own versions.
-- **JSON:** Jackson 3.1 (`tools.jackson.databind`). Do not mix with
-  Jackson 2 (`com.fasterxml.jackson.databind`) artifacts.
-- **Tests:** JUnit 5 + Mockito + AssertJ. Testcontainers when an adapter
-  test needs a real broker, database, or cache.
-- **Architecture:** hexagonal / clean architecture (see
-  `02-clean-architecture.md`).
-
-## Mandatory behavior
-
-- **Inspect before editing.** Read the impacted module's `build.gradle`,
-  package structure, and immediate neighbors before making changes.
+- **Inspect before editing.** Read the impacted module, its manifest
+  (`build.gradle` / `pom.xml` / `pyproject.toml` / `package.json` /
+  `go.mod`), its immediate neighbors, and recent commits before changing
+  anything. Form a hypothesis first.
 - **Preserve current behavior** unless the task is an explicit refactor
   or feature change.
 - **Prefer minimal diffs.** Three short, similar lines beat a premature
-  abstraction.
-- Do not finish with **known compilation errors** in any touched module.
-- Compile the touched module first, then validate the broader path:
+  abstraction. Surrounding cleanup is noise unless it is the task.
+- **Single responsibility.** One reason to change per module, class,
+  function, or file.
+- **Explicit over clever.** A reader should not need to follow three
+  levels of indirection to understand a flow. Prefer descriptive names
+  over comments that explain confusing code.
+- **Immutability by default.** Prefer immutable value types (records,
+  frozen dataclasses, readonly types, value objects). Mutate only where
+  the design requires it.
+- **Dependency injection over globals.** Prefer constructor / parameter
+  injection so collaborators can be substituted in tests. Avoid hidden
+  singletons and global mutable state.
+- **Fail loudly, not silently.** Do not swallow errors. Surface them
+  through the return type, an error channel, or a raised exception with
+  context.
+- **No dead code.** Remove unused imports, dead branches, and
+  commented-out leftovers in the files you touch.
 
-  ```powershell
-  # Per service (Windows PowerShell, from repo root)
-  .\gradlew.bat :<service>:<module>:compileJava
-  .\gradlew.bat :<service>:test
-  ```
+## Mandatory behavior per change
 
-  ```bash
-  # Full smoke after a cross-service change (WSL)
-  bash infrastructure/scripts/smoke-all-services.sh
-  ```
+- Do not finish with **known compile / type / lint errors** in any
+  touched module.
+- Build or type-check the touched module first, then validate the
+  broader path (see `rules/02-validation-and-done-definition.md`).
+- Run the tests that match the change.
+- Match the **existing style** of the surrounding code: naming,
+  formatting, error handling, and file layout.
+- Honor the repository's formatter and linter. Do not hand-format
+  against the configured tool.
 
-- Run the tests that match the change (see
-  `02-validation-and-done-definition.md` for the validation ladder).
-- **Remove unused imports, dead code, and commented-out leftovers.**
-- **Do not use wildcard imports.** Configure or honor existing Spotless
-  / Checkstyle rules.
+## Configuration and secrets
 
-## Delivery conventions
+- Externalize all operationally-meaningful configuration via environment
+  variables with a documented default.
+- Never hardcode secrets. See `policies/05-security-and-secrets.md`.
+- Every new environment variable is documented in `.env.example` and the
+  affected module's README in the same change.
 
-- Prefer **constructor injection** for Spring beans. Avoid field
-  injection.
-- Prefer `record` for DTOs and transport models when immutability is the
-  intent.
-- Keep **domain code framework-free** — no Spring, persistence, HTTP, or
-  messaging SDK imports inside `domain/`.
-- Keep transport mapping (REST, Kafka serializers, R2DBC mappers) at the
-  boundary, never deep inside use cases.
-- Prefer **explicit names** over clever indirection. A reader should not
-  need to follow three levels of abstraction to understand a flow.
-- Add or update **`[ClassName]TestData` builders** for any non-trivial
-  fixture instead of duplicating setup inline.
+## Dependencies
 
-## Java 21 features in active use
+- **Centralize versions.** Declare dependency versions in the project's
+  single source (root `build.gradle` / `libs.versions.toml`,
+  `pyproject.toml`, root `package.json` + lockfile, `go.mod`). Child
+  modules inherit; they do not re-declare versions.
+- Pin to a specific version, never an open range.
+- New dependencies require a one-line rationale and a supply-chain check
+  (`policies/05-security-and-secrets.md`,
+  `skills/dependency-management/SKILL.md`).
 
-- `record` for value objects, command/query DTOs, event payloads.
-- Sealed hierarchies (`sealed`, `non-sealed`, `final`) where the domain
-  has a closed set of variants.
-- Pattern matching `switch` over sealed types instead of visitor classes
-  when readability wins.
-- Text blocks for SQL strings, JSON test fixtures, and large prompts.
-- Virtual threads only when the surrounding chain is **already
-  synchronous** and proven blocking. Never wrap a Reactor pipeline in a
-  virtual-thread executor.
+## Architecture
 
-## Spring Boot 4.0.x specifics
+- Respect the layer boundaries defined in
+  `policies/02-clean-architecture.md`.
+- Keep domain / core logic free of framework, transport, and persistence
+  imports.
+- Keep mapping and serialization at the boundary, never deep inside core
+  logic.
 
-- `application.yaml` over `application.properties`. Environment-specific
-  overrides go in `application-<profile>.yaml`.
-- Externalize all operationally-meaningful configuration via env vars
-  with a default in YAML.
-- Use `@ConfigurationProperties` records over `@Value` constants.
-- Use `WebFluxConfigurer` for HTTP, `KafkaListener`/`ReactiveKafka`
-  bindings for messaging, and R2DBC repositories for SQL.
-- Prefer the constructor form of `WebClient.Builder` injection so test
-  doubles can replace it cleanly.
+## Forbidden patterns (all stacks)
 
-## Package layout convention
+- Committing code with known compile / type / lint errors.
+- Wildcard / star imports where the language allows explicit imports.
+- Catching the broadest error type only to silence it.
+- Global mutable state used as a communication channel.
+- Declaring dependency versions per-module instead of centrally.
+- Hardcoded secrets, URLs, or credentials.
+- Leaving dead code or commented-out blocks in touched files.
 
-Repository base package: `co.com.invexa`.
+## Where stack specifics live
 
-Per service:
+| Stack                         | Profile                          |
+| ----------------------------- | -------------------------------- |
+| Java + Spring Boot            | `stacks/java-spring.md`          |
+| Python + FastAPI              | `stacks/python-fastapi.md`       |
+| Node + TypeScript             | `stacks/node-typescript.md`      |
+| PostgreSQL                    | `stacks/postgresql.md`           |
+| MongoDB                       | `stacks/mongodb.md`              |
+| Redis / Valkey                | `stacks/redis.md`                |
+| Kafka / event streaming       | `stacks/messaging-kafka.md`      |
+| REST / HTTP API design        | `stacks/rest-api-design.md`      |
+| Docker / local infra          | `stacks/docker-compose.md`       |
 
-```
-<service>-ms/
-├── domain/                 # entities, value objects, ports, domain events
-├── usecase/                # application orchestration (a.k.a. application/)
-├── infrastructure/
-│   ├── entry-points/       # webflux-handler, kafka-consumer, scheduler...
-│   └── driven-adapters/    # postgresql, mongo, valkey, alpaca, ollama...
-└── applications/app-service/   # Spring Boot wiring + configuration
-```
-
-Module names match the folders. Test fixtures live next to the production
-classes they support.
-
-## Forbidden patterns
-
-- Wildcard imports.
-- Static `Logger` field on a class without a clear naming convention.
-- Field injection (`@Autowired` on fields).
-- Mixing Jackson 2 + Jackson 3 imports in the same module.
-- Declaring dependency versions inside child-module `build.gradle` files.
-- Calling `block()` / `blockFirst()` / `blockLast()` in production code.
-- Catching `Throwable` to silence failures.
+Activate only the profiles the repository actually uses.

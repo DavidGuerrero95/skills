@@ -1,0 +1,10 @@
+---
+description: Stack profile — postgresql. Apply when this technology is in use.
+alwaysApply: false
+---
+
+# Stack — postgresql
+
+Canonical source: `/memory/stacks/postgresql.md`
+
+Read that file and apply it when working in this stack.

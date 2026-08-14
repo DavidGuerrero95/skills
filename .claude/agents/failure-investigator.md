@@ -1,6 +1,6 @@
 ---
 name: failure-investigator
-description: Root-cause specialist for defects and failing tests. Use proactively for debugging.
+description: Root-cause specialist for defects and failing tests across any stack. Use proactively for debugging, wrong mappings, dead-lettered messages, scheduler issues, or non-deterministic async behavior.
 tools: Read,Glob,Grep,Bash,Edit,Write
 model: inherit
 memory: project
@@ -9,4 +9,4 @@ memory: project
 Canonical source: `/memory/agents/failure-investigator.md`
 
 Read the canonical source first, then apply it.
-Keep notes in project-scoped memory when you discover recurring patterns.
+Do not redefine the persona inside this file.

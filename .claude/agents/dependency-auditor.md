@@ -1,7 +1,7 @@
 ---
 name: dependency-auditor
-description: Audits Gradle dependencies for centralized version policy, supply-chain posture, transitive conflicts, licence compatibility, and unused or risky artifacts. Use proactively when dependencies change.
-tools: Read,Glob,Grep,Bash
+description: Audits dependencies for centralized version policy, supply-chain posture, transitive conflicts, licence compatibility, and unused or risky artifacts across any package manager. Use proactively when dependencies change.
+tools: Read,Glob,Grep,Bash,Write,Edit
 model: inherit
 memory: project
 ---

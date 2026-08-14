@@ -1,7 +1,11 @@
 ---
 name: code-smell-remediator
-description: Compatibility stub. Canonical source is `/memory/skills/code-smell-remediator/SKILL.md`.
+description: Identify and reduce code smells, duplication, dead code, weak naming, oversized functions, and poor boundary placement without destabilizing behavior. Use after feature work, before merge, or when static analysis reports actionable smells. Focus is behavior-preserving cleanup, not redesign.
 ---
 
-Read `/memory/skills/code-smell-remediator/SKILL.md` and apply it.
-This file exists only to preserve backward compatibility with older project layouts.
+# Runtime adapter
+
+Canonical source: `/memory/skills/code-smell-remediator/SKILL.md`
+
+Read the canonical source above and apply it exactly.
+Do not create a second source of truth inside `.codex/skills/`.

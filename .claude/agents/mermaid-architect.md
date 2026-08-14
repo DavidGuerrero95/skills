@@ -1,6 +1,6 @@
 ---
 name: mermaid-architect
-description: Creates and updates Mermaid architecture diagrams. Use proactively when flows change.
+description: Creates and updates Mermaid architecture, sequence, and ownership diagrams that match reality. Use proactively when a module, event path, or ownership changes.
 tools: Read,Glob,Grep,Edit,Write
 model: inherit
 memory: project
@@ -9,4 +9,4 @@ memory: project
 Canonical source: `/memory/agents/mermaid-architect.md`
 
 Read the canonical source first, then apply it.
-Keep notes in project-scoped memory when you discover recurring patterns.
+Do not redefine the persona inside this file.

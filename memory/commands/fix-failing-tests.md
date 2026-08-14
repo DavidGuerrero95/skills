@@ -14,8 +14,8 @@ smallest safe issue, and keeping or improving coverage.
    - test assertion (incorrect expectation).
 5. Apply the smallest fix.
 6. Re-run the test plus the impacted module's suite.
-7. If the test was disabled or quarantined, remove the marker and
-   leave a note.
+7. If the test was disabled or quarantined, remove the marker and leave
+   a note.
 
 ## Recommended delegates
 

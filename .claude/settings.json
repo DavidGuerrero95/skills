@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/prompt_memory_reminder.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/prompt_memory_reminder.py\"",
             "timeout": 15
           }
         ]
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/pre_bash_safety_guard.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/pre_bash_safety_guard.py\"",
             "timeout": 30
           }
         ]
@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/pre_write_secret_scan.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/pre_write_secret_scan.py\"",
             "timeout": 15
           }
         ]
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/post_edit_code_quality.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/post_edit_code_quality.py\"",
             "timeout": 30
           }
         ]
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/session_end_orphan_check.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/session_end_orphan_check.py\"",
             "timeout": 15
           }
         ]
@@ -61,12 +61,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/post_task_docs_sync.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/post_task_docs_sync.py\"",
             "timeout": 30
           },
           {
             "type": "command",
-            "command": "python3 ./scripts/agentic/session_end_orphan_check.py",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/agentic/session_end_orphan_check.py\"",
             "timeout": 15
           }
         ]

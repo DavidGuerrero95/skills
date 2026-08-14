@@ -1,6 +1,6 @@
 ---
 name: technical-writer
-description: Maintains docs and runbooks in sync with implementation. Use proactively when behavior changes.
+description: Maintains docs, ADRs, and runbooks in sync with implementation across any stack. Use proactively when behavior, contracts, env vars, or operational workflows change.
 tools: Read,Glob,Grep,Edit,Write
 model: inherit
 memory: project
@@ -9,4 +9,4 @@ memory: project
 Canonical source: `/memory/agents/technical-writer.md`
 
 Read the canonical source first, then apply it.
-Keep notes in project-scoped memory when you discover recurring patterns.
+Do not redefine the persona inside this file.

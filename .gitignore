@@ -1,0 +1,52 @@
+# Secrets / local env
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Node
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+coverage/
+
+# Java / Gradle / Maven
+.gradle/
+target/
+!**/src/**/target/
+*.class
+
+# Go / Rust
+bin/
+target/
+
+# Logs / temp
+*.log
+tmp/
+.tmp/
+
+# Claude Code local overrides / worktrees
+.claude/settings.local.json
+.claude/worktrees/

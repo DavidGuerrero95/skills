@@ -1,0 +1,10 @@
+---
+description: Stack profile — messaging-kafka. Apply when this technology is in use.
+alwaysApply: false
+---
+
+# Stack — messaging-kafka
+
+Canonical source: `/memory/stacks/messaging-kafka.md`
+
+Read that file and apply it when working in this stack.

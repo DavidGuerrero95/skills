@@ -1,11 +1,10 @@
 ---
 name: technical-doc-writer
-description: Write or update technical documentation, ADRs, runbooks, README sections and operator-facing guidance for this repository. Use whenever behavior, contracts, env vars, scripts or operational workflows change, or when documentation has drifted from the implementation.
-license: Proprietary. Internal use only.
+description: Write or update technical documentation, ADRs, runbooks, README sections, and operator-facing guidance. Use whenever behavior, contracts, env vars, scripts, or operational workflows change, or when documentation has drifted from the implementation.
+license: MIT
 metadata:
-  owner: invexa-platform
   scope: technical-writing
-  version: "1.1"
+  version: "2.0"
 ---
 
 # Technical doc writer
@@ -15,15 +14,14 @@ metadata:
 - README updates after a behavior or contract change.
 - ADRs for decisions with lasting architectural impact.
 - Runbooks for operator workflows (start, stop, reset, recover).
-- Operator guides (paper E2E, kill switch, dashboard alerts).
 - Setup docs (local infra, smoke scripts, env vars).
-- Contract documentation (`docs/contracts/topics.md`,
-  AsyncAPI, JSON schemas).
+- Contract documentation (`docs/contracts/`: OpenAPI, AsyncAPI, JSON
+  Schema, catalog).
 
 ## When NOT to use
 
-- Diagrams — use `skills/mermaid-architecture-diagrams`.
-- Inline javadoc on internal classes (write code that doesn't need it
+- Diagrams — `skills/mermaid-architecture-diagrams`.
+- Inline doc-comments on internal units (write self-explanatory code
   instead).
 
 ## Read first
@@ -35,31 +33,25 @@ metadata:
 
 1. **Identify the surface.**
    - Repository overview → root `README.md`.
-   - Per-service overview → `<service>-ms/README.md`.
+   - Per-module overview → `<module>/README.md`.
    - Decision → `docs/adr/<NNNN>-<slug>.md`.
-   - Operator workflow → `docs/wiki/runbooks/<workflow>.md`.
-   - Architecture overview → `docs/wiki/architecture-overview.md`.
-   - Contracts → `docs/contracts/topics.md` + AsyncAPI / JSON schema.
+   - Operator workflow → `docs/runbooks/<workflow>.md`.
+   - Architecture overview → `docs/architecture/`.
+   - Contracts → `docs/contracts/`.
 
-2. **Audit the implementation.**
-   - Read the actual scripts, ports, env vars, paths.
-   - Do not write what "the system should do"; write what it does.
+2. **Audit the implementation.** Read the actual scripts, ports, env
+   vars, paths. Write what it does, not what it "should" do.
 
-3. **Write from the operator/maintainer perspective.**
-   - Use second person where natural.
-   - Lead with the outcome, then the steps.
-   - Use exact commands and exact file paths.
+3. **Write from the operator/maintainer perspective.** Second person
+   where natural; lead with the outcome, then the steps; exact commands
+   and exact paths.
 
-4. **Keep summaries short.**
-   - Push deep detail into linked sections.
-   - The `README.md` is a quick start, not a reference manual.
+4. **Keep summaries short.** Push deep detail into linked sections; the
+   root README is a quick start, not a reference manual.
 
-5. **Update neighbors when needed.**
-   - A new env var → update `.env.example` + service README +
-     contract doc.
-   - A new script → update the README script list + relevant runbook.
-   - A new topic → update `docs/contracts/topics.md` + AsyncAPI / JSON
-     schema.
+5. **Update neighbors when needed.** A new env var → `.env.example` +
+   module README + contract doc. A new script → README list + runbook.
+   A new endpoint/topic → `docs/contracts/`.
 
 6. **Validate** by running the documented commands when feasible.
 
@@ -76,7 +68,7 @@ Follow-ups still missing:
  - <bullet> (when applicable)
 
 Validation:
- - [ran]  bash infrastructure/scripts/smoke-...sh   (where the doc claims it works)
+ - [ran]  <the command the doc claims works>
 ```
 
 ## ADR conventions
@@ -84,14 +76,14 @@ Validation:
 - File name: `NNNN-<slug>.md`.
 - Sections: `Status`, `Context`, `Decision`, `Consequences`.
 - Status values: `Proposed`, `Accepted`, `Superseded by ADR-NNNN`.
-- One decision per file. Cross-reference related ADRs.
+- One decision per file; cross-reference related ADRs.
 
 ## Runbook conventions
 
 - Title is the operator's task, not the system area.
 - Each step is numbered and copy-paste runnable.
 - Each step ends with the **expected observable outcome**.
-- Failure section lists known errors and their remediation.
+- A failure section lists known errors and their remediation.
 
 ## Forbidden patterns
 

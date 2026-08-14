@@ -1,15 +1,14 @@
 ---
-description: Siempre
-
+description: Always apply the project baseline and canonical memory index.
 alwaysApply: true
 ---
 
-
 # Project baseline
 
-Canonical source files:
-- `/memory/rules/00-project-baseline.md`
+Canonical sources:
 - `/memory/README.md`
 - `/memory/MANIFEST.md`
+- `/memory/rules/00-project-baseline.md`
 
-Read those files and apply them.
+Read those files and apply them. `/memory` is the single source of truth;
+`.cursor/rules` are thin pointers only.

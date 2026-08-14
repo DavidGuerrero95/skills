@@ -1,65 +1,70 @@
-# 02 — Clean architecture policy
+# 02 — Clean / hexagonal architecture policy
 
 ## Purpose
 
-Define the layer boundaries every service in this repository must
-respect. This file is non-negotiable; specific implementation details
-live in `skills/java-spring-implementation`.
+Define the layer boundaries every module in this repository must respect.
+This file is non-negotiable and stack-agnostic. Concrete package/module
+naming for a given stack lives in the matching `stacks/*.md` profile;
+implementation workflow lives in `skills/feature-implementation`.
 
 ## Layer responsibilities
 
 | Layer                              | Owns                                                                       | Must not                                                                 |
 | ---------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `domain/`                          | Entities, value objects, aggregates, domain services, **ports**, events    | Import Spring, persistence, HTTP, messaging SDKs, cloud clients          |
-| `usecase/` (a.k.a. `application/`) | Use-case orchestration; calls domain and ports                             | Import concrete adapters, Spring infrastructure, transport DTOs          |
-| `infrastructure/entry-points/*`    | HTTP routers/handlers, Kafka consumers, schedulers, listeners, CLI         | Contain business rules; manipulate domain entities directly              |
-| `infrastructure/driven-adapters/*` | Persistence, brokers, external APIs, message producers, cache clients      | Be referenced from domain or use cases (only ports are referenced)       |
-| `applications/app-service/`        | Spring `@Configuration`, wiring, profiles, `application.yaml`              | Hold business logic                                                      |
+| `domain` (core)                    | Entities, value objects, aggregates, domain services, **ports**, events    | Import framework, persistence, HTTP, messaging, or cloud SDKs            |
+| `application` (use cases)          | Use-case orchestration; calls domain and ports                             | Import concrete adapters, framework infrastructure, transport DTOs       |
+| `entry-points` (inbound adapters)  | HTTP routers/handlers, message consumers, schedulers, CLI, GraphQL         | Contain business rules; manipulate domain entities directly             |
+| `driven-adapters` (outbound)       | Persistence, brokers, external APIs, producers, cache clients              | Be referenced from domain or use cases (only ports are referenced)      |
+| `app` (composition root)           | Wiring, configuration, profiles, dependency injection setup               | Hold business logic                                                      |
+
+The names are conceptual. Each stack profile maps them to real folders:
+e.g. Java uses `domain/`, `usecase/`, `infrastructure/entry-points/*`,
+`infrastructure/driven-adapters/*`, `applications/app-service/`; a Python
+FastAPI service uses `domain/`, `application/`, `api/` (routers),
+`adapters/`, and `main.py` / `container.py` as the composition root.
 
 ## Direction of dependencies
 
 ```
-domain  <----  usecase  <----  entry-points
-                  ^
-                  |
-            driven-adapters (implement domain ports)
-                  ^
-                  |
-            applications/app-service (wires beans)
+domain  <----  application  <----  entry-points
+                   ^
+                   |
+             driven-adapters (implement domain ports)
+                   ^
+                   |
+             app / composition root (wires everything)
 ```
 
-- `domain` depends on **nothing** outside the JDK and the project's own
-  domain types.
-- `usecase` depends on `domain` (and on ports declared in `domain`).
-- `entry-points/*` depend on `usecase`. They translate transport into
+- `domain` depends on **nothing** outside the language standard library
+  and the project's own domain types.
+- `application` depends on `domain` (and on ports declared in `domain`).
+- `entry-points` depend on `application`. They translate transport into
   use-case input.
-- `driven-adapters/*` depend on `domain` (to implement ports). They do
-  **not** depend on `usecase`.
-- `applications/app-service` is the only module allowed to depend on
-  everything for wiring purposes.
+- `driven-adapters` depend on `domain` (to implement ports). They do
+  **not** depend on `application`.
+- The composition root is the only place allowed to depend on everything
+  for wiring purposes.
 
 ## Concrete rules
 
-- A new class belongs in the layer that matches its **reason to change**.
+- A new unit belongs in the layer that matches its **reason to change**.
   An HTTP DTO changes when the API contract changes → `entry-points`.
-  An event payload model changes when the topic contract changes →
-  `domain` (it is a domain event) or a dedicated transport record in
-  `entry-points`/`driven-adapters` if it is broker-specific framing.
+  A persistence row model changes when the storage schema changes →
+  `driven-adapters`. A business invariant changes → `domain`.
 - **Transactions** belong to use-case orchestration, not to domain
   entities. The transaction boundary equals the use case.
-- **Mappers** live at the translation boundary. `entry-points` mappers
-  go in `entry-points`. `driven-adapters` mappers go in
+- **Mappers / serializers** live at the translation boundary.
+  Inbound mappers go in `entry-points`; outbound mappers go in
   `driven-adapters`. Never put a mapper in `domain`.
 - Shared utilities are allowed only for **truly cross-cutting** concerns
   (clock, ids, JSON helpers). Default to local helpers.
-- Dependency injection happens in `applications/app-service` via Spring
-  configuration. Use cases and adapters are constructor-injected; they
-  do not self-register.
+- Dependency injection happens at the composition root. Use cases and
+  adapters are constructor/parameter-injected; they do not self-register.
 
 ## Review questions before merging
 
-- Is the new class in the correct layer?
-- Is infrastructure leaking inward (Spring, JDBC, Kafka, HTTP)?
+- Is the new unit in the correct layer?
+- Is infrastructure leaking inward (framework, DB driver, HTTP, broker)?
 - Is the mapper located on the boundary?
 - Are ports defined in `domain` and implemented in `driven-adapters`?
 - Is the proposed change smaller than a broad refactor? If not, can the
@@ -67,8 +72,9 @@ domain  <----  usecase  <----  entry-points
 
 ## Common violations to flag
 
-- A `@Service` annotation inside `domain/`.
-- A Jackson `@JsonProperty` on a domain entity.
-- A use case importing from `infrastructure/driven-adapters/*`.
+- A framework annotation (`@Service`, `@Component`, FastAPI `Depends`,
+  ORM decorator) inside `domain`.
+- A serialization annotation on a domain entity.
+- A use case importing a concrete adapter instead of a port.
 - A scheduler or HTTP handler holding business state across calls.
-- A repository implementation referencing `usecase` types.
+- A repository implementation referencing use-case types.

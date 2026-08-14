@@ -28,9 +28,15 @@ stateless. They implement the contracts defined under
 - All scripts read JSON from stdin when invoked as hooks.
 - All scripts write a JSON object to stdout.
 - They are best-effort helpers, not perfect enforcement boundaries.
+- They are **stack-agnostic**: the code-quality and docs-sync hooks
+  detect changes across common languages (Java, Kotlin, Python,
+  TypeScript, Go, Rust, …) plus schema/config files.
 - Adjust the Python interpreter (`python3` vs `python`) for your shell
   if needed; on Windows the harness runs the scripts via the
   configured Python launcher.
+- The Claude Code hook commands use `$CLAUDE_PROJECT_DIR` so the script
+  paths resolve from the project root regardless of the current working
+  directory. Keep that pattern if you edit `.claude/settings.json`.
 
 ## Local smoke
 
@@ -38,7 +44,7 @@ stateless. They implement the contracts defined under
 echo '{}' | python3 scripts/agentic/prompt_memory_reminder.py
 echo '{}' | python3 scripts/agentic/pre_bash_safety_guard.py
 # (Replace the placeholder with a real-looking shape locally to test the deny path.)
-echo '{"tool_input": {"file_path": "src/X.java", "content": "<your-fake-key-here>"}}' \
+echo '{"tool_input": {"file_path": "src/config.txt", "content": "<your-fake-key-here>"}}' \
   | python3 scripts/agentic/pre_write_secret_scan.py
 echo '{}' | python3 scripts/agentic/post_edit_code_quality.py
 echo '{}' | python3 scripts/agentic/post_task_docs_sync.py

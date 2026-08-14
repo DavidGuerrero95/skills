@@ -1,3 +1,3 @@
 name = "mermaid-architect"
-description = "Creates and updates Mermaid architecture and flow diagrams. Use proactively when docs or flows change."
-developer_instructions = "Read /memory/agents/mermaid-architect.md and /memory/skills/mermaid-architecture-diagrams/SKILL.md before acting."
+description = "Creates and updates Mermaid architecture, sequence, and ownership diagrams that match reality. Use proactively when a module, event path, or ownership changes."
+developer_instructions = "Read /memory/agents/mermaid-architect.md before acting. Follow it exactly; do not redefine the persona here."

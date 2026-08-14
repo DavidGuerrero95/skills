@@ -1,0 +1,10 @@
+---
+description: 00 — Project baseline rule
+alwaysApply: true
+---
+
+# 00 — Project baseline rule
+
+Canonical source: `/memory/rules/00-project-baseline.md`
+
+Read that file and apply it.

@@ -4,29 +4,30 @@
 
 Define the non-negotiable security and supply-chain rules. Specific
 shell-safety detection is implemented in
-`scripts/agentic/pre_bash_safety_guard.py` and registered as the
-`pre-bash-safety-guard` hook.
+`scripts/agentic/pre_bash_safety_guard.py` (`pre-bash-safety-guard`
+hook); secret-shaped-string detection in
+`scripts/agentic/pre_write_secret_scan.py` (`pre-write-secret-scan`
+hook). This policy is stack-agnostic.
 
 ## Secrets
 
 - **Never hardcode** secrets, tokens, credentials, or private keys in
   source files, tests, comments, sample payloads, logs, or
   documentation.
-- The canonical templates are `infrastructure/.env.example` and the
-  repo-root `.env.example`. Operators copy these to `.env.local` (not
-  committed) and inject into Docker Compose / Spring profiles.
-- Read secrets only via environment variables documented in the
-  templates. Document any new variable in both `.env.example` files
-  and in the affected service README.
+- The canonical template is the repo-root `.env.example`. Operators copy
+  it to `.env` / `.env.local` (never committed) and inject it into the
+  runtime (Docker Compose, container secrets, CI secrets).
+- Read secrets only via environment variables or a secret manager,
+  documented in `.env.example` and the affected module README.
 - When showing a sample value, use a clearly fake placeholder
-  (`sk-REDACTED`, `xxxx-xxxx`).
-- Do not include secret-shaped strings in commit messages, branch
-  names, PR descriptions or AGENTS.md.
+  (`sk-REDACTED`, `xxxx-xxxx`, `your-token-here`).
+- Do not include secret-shaped strings in commit messages, branch names,
+  PR descriptions, or agent docs.
 
 ## Destructive command guardrails
 
-The following commands require explicit operator confirmation, even
-when the agent believes them safe:
+The following require explicit operator confirmation, even when the
+agent believes them safe:
 
 - `rm -rf` against any path other than `/tmp/...` or a build output.
 - `git push --force` (any target).
@@ -34,7 +35,8 @@ when the agent believes them safe:
   files with uncommitted state.
 - `docker system prune`, `docker volume prune`, `docker network prune`.
 - `terraform destroy`, `kubectl delete ns`, `kubectl delete -f`.
-- `DROP DATABASE`, `DROP SCHEMA`, `TRUNCATE TABLE` against any DB.
+- `DROP DATABASE`, `DROP SCHEMA`, `TRUNCATE TABLE`, `db.dropDatabase()`
+  against any datastore.
 - Bulk file deletion via wildcards (`rm *`, `Remove-Item -Recurse`).
 - Credential reset / rotation commands (broker, registry, cloud).
 
@@ -44,23 +46,24 @@ command is required, surface it to the user before running it.
 
 ## Supply-chain rules
 
-- **Dependency versions are centralized** in the root `build.gradle`
-  (or root `versions.toml` if used). Child modules inherit; they do
-  not declare their own versions.
+- **Dependency versions are centralized** in the project's single source
+  (root build manifest / lockfile). Child modules inherit; they do not
+  declare their own versions.
 - New dependencies require:
   - a one-line rationale in the PR description (why this lib?),
   - a check that the artifact is published from an official source,
   - confirmation that the licence is compatible with the project's
     distribution.
-- Prefer pinning to a specific version (`1.2.3`) over a range (`1.+`).
-- Avoid pulling transitive plugin behavior change (e.g. Gradle plugin
-  `apply false` patterns) without a corresponding ADR if it changes
-  build semantics.
+- Prefer pinning to a specific version over a range.
+- Commit lockfiles (`package-lock.json`, `poetry.lock`, `uv.lock`,
+  `gradle.lockfile`, `go.sum`) so builds are reproducible.
+- Enable dependency and secret scanning in CI
+  (`.github/workflows/ci.yml`).
 
 ## Network and external services
 
 - Avoid introducing unreviewed outbound network calls. Every external
-  call is owned by a `driven-adapter`, has a timeout, and surfaces a
+  call is owned by an outbound adapter, has a timeout, and surfaces a
   configurable URL via env var.
 - Do not enable a new third-party SDK in tests by hitting the real
   endpoint. Use Testcontainers, a recorded fixture, or a local stub.
@@ -69,17 +72,16 @@ command is required, surface it to the user before running it.
 
 - Never log secrets, full HTTP bodies that may contain PII, or broker
   passwords.
-- Logs include canonical keys (`eventId`, `clientOrderId`,
-  `portfolioId`) so an investigator can correlate. Levels: INFO for
-  successful flows, WARN for retries / fallbacks, ERROR for failures
-  that route to DLQ or alerting.
+- Logs include canonical correlation keys (`requestId`, `correlationId`,
+  domain ids) so an investigator can correlate. Levels: INFO for
+  successful flows, WARN for retries / fallbacks, ERROR for failures.
 
 ## Forbidden patterns
 
-- Shell commands that delete or rotate state without explicit
-  operator confirmation.
+- Shell commands that delete or rotate state without explicit operator
+  confirmation.
 - Hardcoded API keys in tests.
-- New env vars added in code without `.env.example` updates.
+- New env vars added in code without updating `.env.example`.
 - Logging request bodies in production.
-- Disabling SCRAM, TLS, or auth "to make local debugging easier" and
-  forgetting to revert.
+- Disabling auth / TLS "to make local debugging easier" and forgetting
+  to revert.

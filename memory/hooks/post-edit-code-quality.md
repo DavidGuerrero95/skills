@@ -3,9 +3,8 @@
 ## Purpose
 
 After a file edit, surface the next validation step the agent should
-take and (when configured) trigger a lightweight smell / test
-reminder. The implementation is in
-`scripts/agentic/post_edit_code_quality.py`.
+take. The implementation is in
+`scripts/agentic/post_edit_code_quality.py` and is stack-agnostic.
 
 ## Trigger
 
@@ -15,11 +14,14 @@ reminder. The implementation is in
 ## Responsibilities
 
 - Inspect changed file types via `git diff --name-only`.
-- Hint at the smallest meaningful next validation:
-  - `.java` ⇒ recommend targeted unit/integration tests + smell pass.
-  - `.sql / .yaml / .yml` ⇒ recommend re-checking environment
-    assumptions, contract impact, doc updates.
-  - `.md` ⇒ recommend cross-checking documentation against
+- Hint at the smallest meaningful next validation, by category:
+  - **Source code** (`.java`, `.kt`, `.py`, `.ts`, `.js`, `.go`,
+    `.rs`, …) ⇒ recommend targeted unit/integration tests + a
+    lint/smell pass.
+  - **Schema / config** (`.sql`, `.yaml`, `.yml`, `.toml`, migration
+    files) ⇒ recommend re-checking environment assumptions, contract
+    impact, and doc updates.
+  - **Docs** (`.md`) ⇒ recommend cross-checking documentation against
     implementation.
 - **Never run validation commands itself.** The hook only emits a
   reminder; the main agent decides whether to run the command.
@@ -32,10 +34,10 @@ reminder. The implementation is in
 
 ## Output contract
 
-Hook stdout is a JSON payload of the form
-`{"systemMessage": "..."}` (or `{}` when there is nothing to surface).
+Hook stdout is `{"systemMessage": "..."}` (or `{}` when there is nothing
+to surface).
 
 ## Idempotency
 
-The hook is stateless. It re-evaluates `git diff` on every invocation
-and emits at most one short message per matching change set.
+Stateless. Re-evaluates `git diff` on every invocation and emits at most
+one short message per matching change set.

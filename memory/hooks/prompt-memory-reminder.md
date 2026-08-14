@@ -4,8 +4,9 @@
 
 At session start (and optionally on prompt submit), remind the agent
 that `/memory` is the canonical source and that runtime adapters
-(`.claude/`, `.codex/`, `.cursor/`, `.agents/`) are thin pointers, not
-content stores. Implementation:
+(`.claude/`, `.codex/`, `.cursor/`, `.agents/`, and the Copilot
+instructions under `.github/`) are thin pointers, not content stores.
+Implementation:
 `scripts/agentic/prompt_memory_reminder.py`.
 
 ## Trigger

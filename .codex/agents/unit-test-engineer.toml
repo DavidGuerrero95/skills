@@ -1,3 +1,3 @@
 name = "unit-test-engineer"
-description = "Specialist for deterministic unit tests and regression coverage. Use proactively after non-trivial code changes."
-developer_instructions = "Read /memory/agents/unit-test-engineer.md and /memory/skills/unit-test-crafter/SKILL.md before acting."
+description = "Specialist for focused unit tests and regression coverage in any stack. Use proactively after code changes, or when a bug fix needs a failing-then-green regression test."
+developer_instructions = "Read /memory/agents/unit-test-engineer.md before acting. Follow it exactly; do not redefine the persona here."

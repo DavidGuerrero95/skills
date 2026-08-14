@@ -1,3 +1,3 @@
 name = "technical-writer"
-description = "Maintains README, ADRs, and runbooks in sync with implementation. Use proactively when behavior changes."
-developer_instructions = "Read /memory/agents/technical-writer.md and /memory/skills/technical-doc-writer/SKILL.md before acting."
+description = "Maintains docs, ADRs, and runbooks in sync with implementation across any stack. Use proactively when behavior, contracts, env vars, or operational workflows change."
+developer_instructions = "Read /memory/agents/technical-writer.md before acting. Follow it exactly; do not redefine the persona here."

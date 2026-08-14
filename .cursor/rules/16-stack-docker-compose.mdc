@@ -1,0 +1,10 @@
+---
+description: Stack profile — docker-compose. Apply when this technology is in use.
+alwaysApply: false
+---
+
+# Stack — docker-compose
+
+Canonical source: `/memory/stacks/docker-compose.md`
+
+Read that file and apply it when working in this stack.

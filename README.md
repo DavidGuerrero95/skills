@@ -1,24 +1,26 @@
-# INVEXA agentic memory foundation
+# Agentic memory foundation
 
-Reusable, idempotent baseline of skills, agents, hooks, commands,
-policies, rules and output styles for **Claude Code**, **Codex**, and
-**Cursor** when building Java 21 + Spring Boot 4.0.x reactive
-microservices in the INVEXA family of projects.
+A reusable, idempotent, **stack-agnostic** baseline of skills, agents,
+hooks, commands, policies, rules, stack profiles and output styles for
+**Claude Code**, **Codex**, **Cursor**, and **GitHub Copilot**. Drop it
+into any repository and adapt a few placeholders — it does not assume a
+language, framework, or product.
 
 ## Design goals
 
 1. **`/memory` is the canonical source of truth.** Adapter folders
-   (`.claude/`, `.codex/`, `.cursor/`, `.agents/`) reference it and
-   never duplicate content.
-2. **Single responsibility per file.** Every memory file owns exactly
-   one trigger and one responsibility (see
-   `memory/MANIFEST.md`).
-3. **Idempotency.** Adding new content updates the canonical owner;
-   it never creates a parallel file.
-4. **Progressive disclosure.** Short index → policies → rules → skills
-   → on-demand references.
-5. **Multi-runtime parity.** Claude Code, Codex and Cursor see the
-   same content via thin adapter wrappers.
+   (`.claude/`, `.codex/`, `.cursor/`, `.agents/`, `.github/` Copilot
+   instructions) reference it and never duplicate content.
+2. **Single responsibility per file.** Every memory file owns exactly one
+   trigger and one responsibility (see `memory/MANIFEST.md`).
+3. **Idempotency.** Adding new content updates the canonical owner; it
+   never creates a parallel file.
+4. **Progressive disclosure.** Short index → policies → rules → stacks →
+   skills → on-demand references.
+5. **Stack-agnostic core + opt-in stack profiles.** Universal invariants
+   live in `policies/`; language/datastore specifics live in `stacks/`.
+6. **Multi-runtime parity.** Claude Code, Codex, Cursor, and Copilot see
+   the same content via thin adapter wrappers.
 
 ## Repository layout
 
@@ -26,117 +28,95 @@ microservices in the INVEXA family of projects.
 memory/                     # CANONICAL — single source of truth
   README.md
   MANIFEST.md
-  policies/                 # non-negotiable invariants
+  policies/                 # stack-agnostic invariants
   rules/                    # how work is executed
+  stacks/                   # language / framework / datastore profiles
   skills/                   # reusable workflows (SKILL.md per skill)
   agents/                   # specialized personas
   hooks/                    # lifecycle automation contracts
   commands/                 # explicit user-invoked entrypoints
   output-styles/            # tone-only
 
-.claude/                    # Claude Code adapter
-  settings.json             # hook wiring
-  agents/*.md               # thin wrappers → /memory/agents/*.md
-  commands/*.md             # thin wrappers → /memory/commands/*.md
-  skills/<skill>/SKILL.md   # thin wrappers → /memory/skills/<skill>/
-  output-styles/*.md        # thin wrappers → /memory/output-styles/*.md
-
-.codex/                     # Codex adapter
-  config.toml
-  hooks.json                # hook wiring
-  agents/*.toml             # thin wrappers → /memory/agents/*.md
-  skills/<skill>/SKILL.md   # thin wrappers → /memory/skills/<skill>/
-  policies/*.md             # thin wrappers → /memory/policies/*.md
-
-.agents/                    # anthropics/skills layout (tool-neutral)
-  skills/<skill>/SKILL.md   # thin wrappers → /memory/skills/<skill>/
-
-.cursor/                    # Cursor adapter
-  rules/*.mdc               # thin wrappers → /memory/policies|rules/*.md
-
-scripts/agentic/            # hook implementations
-  prompt_memory_reminder.py
-  pre_bash_safety_guard.py
-  pre_write_secret_scan.py
-  post_edit_code_quality.py
-  post_task_docs_sync.py
-  session_end_orphan_check.py
+.claude/                    # Claude Code adapter (settings.json + wrappers)
+.codex/                     # Codex adapter (hooks.json + wrappers)
+.cursor/                    # Cursor adapter (rules/*.mdc)
+.agents/                    # tool-neutral skills (anthropics/skills layout)
+.github/
+  copilot-instructions.md   # GitHub Copilot adapter (root)
+  instructions/             # Copilot path-scoped instructions
+  workflows/                # CI/CD pipelines
+scripts/agentic/            # hook implementations (Python)
 
 CLAUDE.md                   # short Claude operating guide → /memory
-AGENTS.md                   # short Codex operating guide → /memory
+AGENTS.md                   # short Codex/Copilot operating guide → /memory
 ```
 
-## Coverage
+## What's inside
 
-### Policies (`memory/policies/`)
+### Policies (`memory/policies/`) — stack-agnostic
 
-- `00-governance.md` — memory governance and change control
-- `01-engineering-baseline.md` — Java 21 + Spring 4.0.x + Gradle
-- `02-clean-architecture.md` — hexagonal layer matrix
-- `03-reactive-and-messaging.md` — Reactor + Kafka invariants
-- `04-testing-and-quality-gates.md` — Spotless + Sonar + JaCoCo 70 %
-- `05-security-and-secrets.md` — secrets, destructive guardrails,
-  supply chain
-- `06-investment-domain-guardrails.md` — INVEXA trading safety
-- `07-documentation-and-traceability.md` — doc surfaces & cadence
+`00-governance`, `01-engineering-baseline`, `02-clean-architecture`,
+`03-async-and-messaging`, `04-testing-and-quality-gates`,
+`05-security-and-secrets`, `06-domain-guardrails` (project template),
+`07-documentation-and-traceability`.
 
 ### Rules (`memory/rules/`)
 
-- `00-project-baseline.md` — inspect → change → validate → summarize
-- `01-task-execution-flow.md` — task sequence + DOR + escalation
-- `02-validation-and-done-definition.md` — DoD + validation ladder
-- `03-subagent-delegation.md` — when and how to delegate
-- `04-idempotency-and-event-contracts.md` — per-layer key matrix
-- `05-diagrams-and-docs.md` — Mermaid + docs cadence
+`00-project-baseline`, `01-task-execution-flow`,
+`02-validation-and-done-definition`, `03-subagent-delegation`,
+`04-idempotency-and-event-contracts`, `05-diagrams-and-docs`.
+
+### Stack profiles (`memory/stacks/`)
+
+`java-spring`, `python-fastapi`, `node-typescript`, `postgresql`,
+`mongodb`, `redis`, `messaging-kafka`, `rest-api-design`,
+`docker-compose`.
 
 ### Skills (`memory/skills/`)
 
-- `java-spring-implementation` — implement / refactor Java + Spring
-- `reactive-kafka-engineering` — Reactor + Kafka + R2DBC + DLQ
-- `unit-test-crafter` — JUnit 5 + Mockito + AssertJ + regression
-- `e2e-test-crafter` — smoke + E2E across services
-- `code-smell-remediator` — behavior-preserving cleanup
-- `implementation-bug-hunter` — root cause + regression
-- `investment-domain-review` — trading safety review
-- `mermaid-architecture-diagrams` — diagrams that match reality
-- `state-of-the-art-research` — pattern selection grounded in repo
-- `technical-doc-writer` — README / ADR / runbook authoring
-- `dependency-management` — Gradle deps + supply chain
+`feature-implementation`, `async-messaging-engineering`,
+`unit-test-crafter`, `e2e-test-crafter`, `code-smell-remediator`,
+`implementation-bug-hunter`, `domain-safety-review`, `database-design`,
+`mermaid-architecture-diagrams`, `state-of-the-art-research`,
+`technical-doc-writer`, `dependency-management`.
 
 ### Agents (`memory/agents/`)
 
-`java-implementation-engineer`, `java-architect`,
-`unit-test-engineer`, `e2e-test-engineer`, `code-smell-auditor`,
-`failure-investigator`, `mermaid-architect`, `technical-writer`,
+`implementation-engineer`, `software-architect`, `unit-test-engineer`,
+`e2e-test-engineer`, `code-smell-auditor`, `failure-investigator`,
+`database-engineer`, `mermaid-architect`, `technical-writer`,
 `security-reviewer`, `code-reviewer`, `dependency-auditor`.
 
 ### Commands (`memory/commands/`)
 
 `/implement-feature`, `/review-changes`, `/audit-code-smells`,
 `/write-e2e-tests`, `/fix-failing-tests`, `/root-cause-analysis`,
-`/generate-diagrams`, `/sync-documentation`, `/refactor-module`.
+`/generate-diagrams`, `/sync-documentation`, `/refactor-module`,
+`/design-database`.
 
 ### Hooks (`memory/hooks/`)
 
 `prompt-memory-reminder`, `pre-bash-safety-guard`,
-`pre-write-secret-scan`, `post-edit-code-quality`,
-`post-task-docs-sync`, `session-end-orphan-check`,
-`subagent-stop-summary`.
+`pre-write-secret-scan`, `post-edit-code-quality`, `post-task-docs-sync`,
+`session-end-orphan-check`, `subagent-stop-summary`.
 
 ### Output styles (`memory/output-styles/`)
 
 `Terse Caveman`, `Teaching Senior`, `Architect Audit`,
 `Incident Responder`.
 
-## Suggested rollout
+## Rollout in a new repository
 
 1. Copy this scaffold into the target repository root.
 2. Read `memory/README.md` and `memory/MANIFEST.md`.
-3. Merge the generated `AGENTS.md` and `CLAUDE.md` with any existing
-   root operating guides.
-4. Adjust `python3` vs `python` in `.claude/settings.json` and
-   `.codex/hooks.json` to match your environment.
-5. Smoke-test the hooks:
+3. Keep the `stacks/` profiles you use; the rest stay as reference.
+4. Fill in `policies/06-domain-guardrails.md` (ownership map + critical
+   invariants) and the idempotency matrix in
+   `rules/04-idempotency-and-event-contracts.md`.
+5. Adjust coverage threshold and validation commands to your toolchain.
+6. Merge `AGENTS.md` and `CLAUDE.md` with any existing root guides.
+7. Confirm `python3` vs `python` for the hooks in `.claude/settings.json`
+   and `.codex/hooks.json`, then smoke-test:
 
    ```bash
    echo '{}' | python3 scripts/agentic/prompt_memory_reminder.py
@@ -144,6 +124,8 @@ AGENTS.md                   # short Codex operating guide → /memory
    echo '{}' | python3 scripts/agentic/pre_write_secret_scan.py
    ```
 
-6. Start small: enable safety + docs-sync hooks first, then expand.
-7. When a new responsibility appears, find the canonical owner in
-   `memory/MANIFEST.md` and update it. Do not add a parallel file.
+8. Point the CI workflow in `.github/workflows/` at your stack's jobs.
+
+## License
+
+MIT — see `LICENSE`.

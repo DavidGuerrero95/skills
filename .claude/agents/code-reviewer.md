@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
-description: Independent diff reviewer for correctness, layer placement, idempotency keys, test coverage, and style. Use proactively for a second pair of eyes before merge.
-tools: Read,Glob,Grep
+description: Independent diff reviewer for correctness, layer placement, idempotency keys, test coverage, and style across any stack. Use proactively for a second pair of eyes on a non-trivial change before merge, especially when the implementer also wrote the tests.
+tools: Read,Glob,Grep,Write,Edit
 model: inherit
 memory: project
 ---

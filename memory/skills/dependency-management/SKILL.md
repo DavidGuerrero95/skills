@@ -1,11 +1,10 @@
 ---
 name: dependency-management
-description: Add, upgrade or remove Gradle dependencies safely while keeping versions centralized in the root build.gradle, supply chain inputs reviewed, and license posture intact. Use whenever a new artifact is introduced, a version is bumped, a transitive conflict appears, or a licence concern is raised.
-license: Proprietary. Internal use only.
+description: Add, upgrade, or remove dependencies safely across any package manager (Gradle/Maven, uv/Poetry/pip, npm/pnpm, Go modules) while keeping versions centralized, supply-chain inputs reviewed, and licence posture intact. Use whenever an artifact is introduced, a version is bumped, a transitive conflict appears, or a licence concern is raised.
+license: MIT
 metadata:
-  owner: invexa-platform
-  scope: gradle-dependencies-supply-chain
-  version: "1.0"
+  scope: dependencies-supply-chain
+  version: "2.0"
 ---
 
 # Dependency management
@@ -21,67 +20,43 @@ metadata:
 ## When NOT to use
 
 - Pure code changes inside an existing dependency.
-- Spring/Reactor implementation work — `skills/java-spring-implementation`.
-- Static analysis configuration changes — separate, limited diff.
+- Feature implementation — `skills/feature-implementation`.
 
 ## Read first
 
 - `memory/policies/01-engineering-baseline.md` (centralization rule)
 - `memory/policies/05-security-and-secrets.md` (supply-chain rules)
+- The active `memory/stacks/<stack>.md` for the manifest/lockfile.
 
 ## Centralization rule (non-negotiable)
 
-- **All dependency versions are declared in the root `build.gradle`** (or
-  the project's `versions.toml` / `gradle/libs.versions.toml`, when
-  used).
-- Child modules **must not** declare their own versions. They depend on
-  named coordinates and inherit the version from the root.
-- A new dependency lands in two diffs combined into one commit: root
-  declaration + child usage.
+- **Versions live in the project's single source:** root `build.gradle`
+  / `gradle/libs.versions.toml`, `pyproject.toml`, root `package.json`,
+  `go.mod`.
+- Child modules reference coordinates without versions and inherit them.
+- Commit the **lockfile** so builds are reproducible.
 
 ## Workflow
 
-1. **State the need.**
-   - Why this dependency is required.
-   - What the alternative is (in-tree code, JDK, an existing dep).
-
-2. **Pick a published artifact from a trusted source.**
-   - Maven Central or an explicitly approved internal registry.
-   - Pin to a specific version (`1.2.3`), never a range (`1.+`).
-
-3. **Check the licence.**
-   - Compatible with this project's distribution model.
-   - Document the licence in the PR description if it is unusual.
-
-4. **Add at the root.**
-   - Update root `build.gradle` (or `libs.versions.toml`).
-   - Group with related deps.
-
-5. **Use in child modules.**
-   - Reference by coordinate (no version).
-   - Confirm the dependency is in the correct configuration:
-     `implementation` / `api` / `runtimeOnly` / `testImplementation`.
-
-6. **Resolve transitive conflicts** explicitly.
-   - Use `dependencyInsight` to inspect:
-
-     ```powershell
-     .\gradlew.bat :<service>:<module>:dependencyInsight --dependency <coord>
-     ```
-
-   - Pin via `resolutionStrategy` only when there is a real conflict.
-
-7. **Validate.**
-   - `./gradlew.bat clean test` for the impacted modules.
-   - Spotless / Sonar / JaCoCo gates remain green.
-   - The `.github/workflows/ci.yml` secret-scan does not flag the
-     change.
+1. **State the need.** Why this dependency; what the alternative is
+   (in-tree code, stdlib, an existing dep).
+2. **Pick a published artifact from a trusted source.** Official
+   registry; pin an exact version, never a floating range.
+3. **Check the licence.** Compatible with the project's distribution;
+   note anything unusual in the PR.
+4. **Add at the single source** and update the lockfile.
+5. **Use in modules** by coordinate; confirm the correct scope
+   (runtime vs. dev/test vs. compile-only).
+6. **Resolve transitive conflicts** explicitly with the tool's
+   inspection command; pin only for a real conflict.
+7. **Validate.** Build + tests for impacted modules; quality gates green;
+   the CI dependency/secret scan does not flag the change.
 
 ## Output expected from this skill
 
 ```
 Dependency change:
- - added | bumped | removed: <coord> -> <version>
+ - added | bumped | removed: <coordinate> -> <version>
 
 Reason:
  - <one-paragraph>
@@ -90,18 +65,18 @@ Supply-chain notes:
  - source registry, licence, transitive impact
 
 Files touched:
- - build.gradle (root)
- - <service>/<module>/build.gradle
+ - <manifest> (single source), <lockfile>
 
 Validation:
- - [ran]  ./gradlew :<service>:<module>:test
- - [ran]  ./gradlew :<service>:dependencies (when conflicts suspected)
+ - [ran]  <build/test command>
+ - [ran]  <dependency inspection> (when conflicts suspected)
 ```
 
 ## Forbidden patterns
 
-- Declaring a version inside a child-module `build.gradle`.
+- Declaring a version per-module instead of centrally.
 - Pulling a dependency from an unknown source.
-- Pinning a version range that floats across builds.
-- Bumping a major version (`X.0.0`) silently inside a feature PR.
-- Adding a dependency without recording the rationale in the PR.
+- Pinning a floating range that changes across builds.
+- Bumping a major version silently inside a feature change.
+- Adding a dependency without recording the rationale.
+- Committing without updating the lockfile.

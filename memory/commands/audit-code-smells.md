@@ -16,4 +16,5 @@ only. Behavior-preserving cleanup, not redesign.
 ## Recommended delegates
 
 - `code-smell-auditor` (lead)
-- `java-architect` when a fix would require an architectural decision
+- `software-architect` when a fix would require an architectural
+  decision

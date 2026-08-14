@@ -1,7 +1,11 @@
 ---
 name: state-of-the-art-research
-description: Compatibility stub. Canonical source is `/memory/skills/state-of-the-art-research/SKILL.md`.
+description: Research architecture, implementation, or platform decisions using local repository context and documented standards before proposing a new baseline. Use when selecting between patterns, comparing options for a shared foundation, or proposing a new module skeleton, ADR, or migration.
 ---
 
-Read `/memory/skills/state-of-the-art-research/SKILL.md` and apply it.
-This file exists only to preserve backward compatibility with older project layouts.
+# Runtime adapter
+
+Canonical source: `/memory/skills/state-of-the-art-research/SKILL.md`
+
+Read the canonical source above and apply it exactly.
+Do not create a second source of truth inside `.codex/skills/`.

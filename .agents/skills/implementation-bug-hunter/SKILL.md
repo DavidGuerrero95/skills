@@ -1,6 +1,6 @@
 ---
 name: implementation-bug-hunter
-description: Investigate failing behavior, trace root cause, propose the smallest safe fix, and add regression validation.
+description: Investigate failing behavior, trace root cause, propose the smallest safe fix, and add regression validation. Use for production-like defects, failing tests, wrong mappings, broken contracts, scheduler/reconciliation issues, and subtle async behavior.
 ---
 
 # Runtime adapter

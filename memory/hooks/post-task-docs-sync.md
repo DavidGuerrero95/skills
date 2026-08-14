@@ -2,10 +2,10 @@
 
 ## Purpose
 
-When a task ends and code changed without a matching doc update,
-generate a reminder pointing the agent at the affected docs (README,
-ADRs, runbooks, diagrams, contract docs). Implementation:
-`scripts/agentic/post_task_docs_sync.py`.
+When a task ends and code changed without a matching doc update, generate
+a reminder pointing the agent at the affected docs (README, ADRs,
+runbooks, diagrams, contract docs). Implementation:
+`scripts/agentic/post_task_docs_sync.py`. Stack-agnostic.
 
 ## Trigger
 
@@ -15,9 +15,10 @@ ADRs, runbooks, diagrams, contract docs). Implementation:
 ## Responsibilities
 
 - Inspect `git diff --name-only`.
-- If code-bearing files changed (`.java`, `.sql`, `.yaml`, `.yml`,
-  `.sh`, `.py`) **and** no doc file changed (`.md`, `docs/...`), emit
-  a one-line reminder.
+- If code-bearing files changed (any common source, schema, or config
+  extension: `.java`, `.kt`, `.py`, `.ts`, `.js`, `.go`, `.rs`, `.sql`,
+  `.yaml`, `.yml`, `.toml`, `.sh`) **and** no doc file changed (`.md`,
+  `docs/...`), emit a one-line reminder.
 - Suggest concrete doc surfaces to check, per
   `policies/07-documentation-and-traceability.md`.
 

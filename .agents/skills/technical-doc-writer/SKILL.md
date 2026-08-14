@@ -1,6 +1,6 @@
 ---
 name: technical-doc-writer
-description: Write or update technical documentation, ADRs, runbooks, README sections, and operational guidance for this repository.
+description: Write or update technical documentation, ADRs, runbooks, README sections, and operator-facing guidance. Use whenever behavior, contracts, env vars, scripts, or operational workflows change, or when documentation has drifted from the implementation.
 ---
 
 # Runtime adapter

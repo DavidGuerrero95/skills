@@ -1,7 +1,7 @@
 ---
 name: code-smell-auditor
-description: Reviews changed code for smells, duplication, dead code, weak naming, and architecture drift. Use proactively after implementation.
-tools: Read,Glob,Grep,Edit
+description: Reviews changed code for smells, duplication, dead code, weak naming, and architecture drift across any stack. Use proactively after implementation, before merge.
+tools: Read,Glob,Grep,Edit,Write
 model: inherit
 memory: project
 ---

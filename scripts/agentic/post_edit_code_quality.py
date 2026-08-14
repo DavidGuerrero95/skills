@@ -1,29 +1,56 @@
 #!/usr/bin/env python3
-import json, subprocess, sys
-from pathlib import Path
+"""Post-edit code-quality reminder hook (stack-agnostic).
+
+Reads changed files from git and emits a single short reminder about the
+smallest meaningful next validation. It never runs validation itself.
+
+Contract: see /memory/hooks/post-edit-code-quality.md
+"""
+import json
+import subprocess
+import sys
+
+CODE_EXT = (
+    ".java", ".kt", ".py", ".ts", ".tsx", ".js", ".jsx",
+    ".go", ".rs", ".rb", ".cs", ".scala", ".php",
+)
+SCHEMA_CONFIG_EXT = (".sql", ".yaml", ".yml", ".toml", ".properties")
+
 
 def git_changed():
-    try:
-        out = subprocess.check_output(["git", "diff", "--name-only", "--cached"], text=True).strip()
-        staged = [x for x in out.splitlines() if x.strip()]
-    except Exception:
-        staged = []
-    try:
-        out = subprocess.check_output(["git", "diff", "--name-only"], text=True).strip()
-        unstaged = [x for x in out.splitlines() if x.strip()]
-    except Exception:
-        unstaged = []
-    return sorted(set(staged + unstaged))
+    files = []
+    for args in (
+        ["git", "diff", "--name-only", "--cached"],
+        ["git", "diff", "--name-only"],
+    ):
+        try:
+            out = subprocess.check_output(args, text=True).strip()
+            files.extend(x for x in out.splitlines() if x.strip())
+        except Exception:
+            pass
+    return sorted(set(files))
 
-changed = git_changed()
-interesting = [p for p in changed if p.endswith((".java", ".kt", ".gradle", ".md", ".yaml", ".yml", ".sql"))]
 
-msg = None
-if any(p.endswith(".java") for p in interesting):
-    msg = "Java-related files changed. Run targeted unit/integration validation and consider a code-smell review."
-elif any(p.endswith((".sql", ".yaml", ".yml")) for p in interesting):
-    msg = "Infra/config files changed. Re-check environment assumptions, contract impact, and docs."
-elif any(p.endswith(".md") for p in interesting):
-    msg = "Documentation files changed. Verify they still match the implemented behavior."
+def main():
+    changed = git_changed()
+    msg = None
+    if any(p.endswith(CODE_EXT) for p in changed):
+        msg = (
+            "Source files changed. Run targeted unit/integration tests for "
+            "the touched module and consider a lint/smell pass."
+        )
+    elif any(p.endswith(SCHEMA_CONFIG_EXT) for p in changed):
+        msg = (
+            "Schema/config files changed. Re-check environment assumptions, "
+            "contract impact, and whether docs must be updated."
+        )
+    elif any(p.endswith(".md") for p in changed):
+        msg = (
+            "Documentation files changed. Verify they still match the "
+            "implemented behavior."
+        )
+    sys.stdout.write(json.dumps({"systemMessage": msg} if msg else {}))
 
-sys.stdout.write(json.dumps({"systemMessage": msg} if msg else {}))
+
+if __name__ == "__main__":
+    main()
